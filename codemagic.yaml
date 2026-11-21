@@ -1,0 +1,20 @@
+workflows:
+  gigpilot-compose-apk:
+    name: GigPilot Compose Splash APK
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      java: 17
+    scripts:
+      - name: Extract project ZIP
+        script: unzip -oq GigPilot-Jetpack-Compose.zip -d .
+      - name: Download Gradle
+        script: |
+          curl -fL --retry 3 https://services.gradle.org/distributions/gradle-8.9-bin.zip -o /tmp/gradle-8.9-bin.zip
+          unzip -oq /tmp/gradle-8.9-bin.zip -d /tmp
+      - name: Set Android SDK location
+        script: echo "sdk.dir=$ANDROID_SDK_ROOT" > GigPilotCompose/local.properties
+      - name: Build debug APK
+        script: /tmp/gradle-8.9/bin/gradle -p GigPilotCompose assembleDebug
+    artifacts:
+      - GigPilotCompose/app/build/outputs/apk/debug/*.apk
